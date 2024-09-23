@@ -15,6 +15,8 @@
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+        <!-- <link href="/css/demo.css" rel="stylesheet"> -->
+
     </head>
     <body>
         hello jsp
@@ -24,6 +26,6 @@
         <h2>
             ${hoidanit}
         </h2>
-        <button class="btn btn-success">Submit </button>
+        <button class="btn btn-warning">Submit </button>
     </body>
     </html>
