@@ -8,7 +8,7 @@
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>User Detail</title>
+                <title>User Detail ${id}</title>
                 <!-- Latest compiled and minified CSS -->
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -26,16 +26,27 @@
                     <div class="row">
                         <div class="col-12 mx-auto">
                             <div class="d-flex justify-content-between">
-                                <h3>user detail</h3>
-                                <a href="/admin/user/create" class="btn btn-primary">Create a user</a>
+                                <h3>user detail: width id = ${id}</h3>
                             </div>
 
                             <hr />
-
+                            <div class="card" style="width: 60%;">
+                                <div class="card-header">
+                                  user information
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                  <li class="list-group-item">id: ${user.id}</li>
+                                  <li class="list-group-item">Email: ${user.email}</li>
+                                  <li class="list-group-item">FullName: ${user.full_name}</li>
+                                  <li class="list-group-item">Address: ${user.address}</li>
+                                  <li class="list-group-item">Phone: ${user.phone}</li>
+                                  <li class="list-group-item">Phone: ${user.password}</li>
+                                </ul>
+                              </div>
                                 </tbody>
                             </table>
                         </div>
-
+                            <a href="/admin/user" class="btn btn-success mt-3">Back</a>
                     </div>
 
                 </div>
