@@ -22,7 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         bean.setSuffix(".jsp");
         return bean;
     }
-///sosnu da o dday
+
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         registry.viewResolver(viewResolver());
