@@ -20,8 +20,9 @@ public class Role {
 
     private String description;
 
-        @OneToMany
+    @OneToMany( mappedBy = "role")
     private List<User> users;
+
 
 
     public long getId() {
