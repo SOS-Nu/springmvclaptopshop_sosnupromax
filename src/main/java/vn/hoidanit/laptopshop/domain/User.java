@@ -28,14 +28,13 @@ public class User {
     private String avatar;
 
     // roleId
-
+    // User many -> to one -> role
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-
-    @OneToMany( mappedBy = "user")
-    private List<Order> Orders; 
+    @OneToMany(mappedBy = "user")
+    List<Order> orders;
 
     public long getId() {
         return id;

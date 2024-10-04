@@ -9,8 +9,8 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User save(User eric);
-    
-    void deleteById()
+
+    void deleteById(long id);
 
     List<User> findOneByEmail(String email);
 
