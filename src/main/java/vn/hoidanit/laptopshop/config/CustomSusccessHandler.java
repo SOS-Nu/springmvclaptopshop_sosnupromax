@@ -36,7 +36,6 @@ public class CustomSusccessHandler implements AuthenticationSuccessHandler {
         throw new IllegalStateException();
     }
 
-    // 123
     protected void clearAuthenticationAttributes(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) {
