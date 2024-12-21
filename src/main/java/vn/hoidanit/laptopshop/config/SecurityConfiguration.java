@@ -83,6 +83,9 @@ public class SecurityConfiguration {
 
                 // rememberme + dong code @bean session rememberme dong tirnh duyet se van luu
                 // cookie
+                // maxxsession preventslogin neu la false thi no se da nguoi dang dang nhap ra .
+                // neu la true
+                // thi no se doi het phien dang nhap moi vao duoc
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .failureUrl("/login?error")
