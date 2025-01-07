@@ -159,6 +159,9 @@
     //     }
     //     button.parent().parent().find('input').val(newVal);
     // });
+
+    $('#btnFilter').click(function () {
+
     $('.quantity button').on('click', function () {
         let change = 0;
 
@@ -234,6 +237,8 @@
         formatted = formatted.replace(/\./g, ',');
         return formatted;
     }
+
+
 
 })(jQuery);
 

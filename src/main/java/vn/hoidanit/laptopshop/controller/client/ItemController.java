@@ -1,6 +1,7 @@
 package vn.hoidanit.laptopshop.controller.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,18 +13,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import vn.hoidanit.laptopshop.domain.Cart;
 import vn.hoidanit.laptopshop.domain.CartDetail;
 import vn.hoidanit.laptopshop.domain.Product;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.service.ProductService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ItemController {
@@ -150,7 +149,11 @@ public class ItemController {
     @GetMapping("/products")
     public String getProductPage(Model model,
             @RequestParam("page") Optional<String> pageOptional,
-            @RequestParam("name") Optional<String> nameOptional) {
+            @RequestParam("name") Optional<String> nameOptional,
+            @RequestParam("min-price") Optional<String> minOptional,
+            @RequestParam("max-price") Optional<String> maxOptional,
+            @RequestParam("factory") Optional<String> factoryOptional,
+            @RequestParam("price") Optional<String> priceOptional) {
         int page = 1;
         try {
             if (pageOptional.isPresent()) {
@@ -164,10 +167,43 @@ public class ItemController {
             // TODO: handle exception
         }
 
-        String name = nameOptional.get();
+        Pageable pageable = PageRequest.of(page - 1, 60);
 
-        Pageable pageable = PageRequest.of(page - 1, 6);
-        Page<Product> prs = this.productService.fetchProducts(pageable, name);
+        String name = nameOptional.isPresent() ? nameOptional.get() : "";
+        Page<Product> prs = this.productService.fetchProductsWithSpec(pageable,
+                name);
+
+        // case 1
+        // double min = minOptional.isPresent() ? Double.parseDouble(minOptional.get())
+        // : 0;
+        // Page<Product> prs = this.productService.fetchProductsWithSpec(pageable, min);
+
+        // case 2 max-price
+        // double max = maxOptional.isPresent() ? Double.parseDouble(maxOptional.get())
+        // : 0;
+        // Page<Product> prs = this.productService.fetchProductsWithSpec(pageable, max);
+
+        // case 3 factory
+        // String factory = factoryOptional.isPresent() ? factoryOptional.get()
+        // : "";
+        // Page<Product> prs = this.productService.fetchProductsWithSpec(pageable,
+        // factory);
+
+        // case 4 many factory
+        // List<String> factory = Arrays.asList(factoryOptional.get().split(","));
+        // Page<Product> prs = this.productService.fetchProductsWithSpec(pageable,
+        // factory);
+
+        // case5 price range
+        // String price = priceOptional.isPresent() ? priceOptional.get() : "";
+        // Page<Product> prs = this.productService.fetchProductsWithSpec(pageable,
+        // price);
+
+        // case 6 price many range
+        // List<String> price = Arrays.asList(priceOptional.get().split(","));
+        // Page<Product> prs = this.productService.fetchProductsWithSpec(pageable,
+        // price);
+
         List<Product> products = prs.getContent();
 
         model.addAttribute("products", products);
