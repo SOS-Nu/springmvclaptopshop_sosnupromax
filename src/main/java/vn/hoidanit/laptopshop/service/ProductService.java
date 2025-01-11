@@ -15,6 +15,7 @@ import vn.hoidanit.laptopshop.domain.Order;
 import vn.hoidanit.laptopshop.domain.OrderDetail;
 import vn.hoidanit.laptopshop.domain.Product;
 import vn.hoidanit.laptopshop.domain.User;
+import vn.hoidanit.laptopshop.domain.dto.ProductCriteriaDTO;
 import vn.hoidanit.laptopshop.domain.specification.ProductSpecs;
 import vn.hoidanit.laptopshop.repository.CartDetailRepository;
 import vn.hoidanit.laptopshop.repository.CartRepository;
@@ -54,18 +55,47 @@ public class ProductService {
         return this.productRepository.findAll(page);
     }
 
-    // public Page<Product> fetchProductsWithSpec(Pageable page,
-    // String name) {
-    // return this.productRepository.findAll(ProductSpecs.nameLike(name), page);
-    // }
+    public Page<Product> fetchProductsWithSpec(Pageable page,
+            ProductCriteriaDTO productCriteriaDTO) {
 
-    // case1
+        if (productCriteriaDTO.getTarget() == null
+                && productCriteriaDTO.getPrice() == null
+                && productCriteriaDTO.getFactory() == null) {
+            return this.productRepository.findAll(page);
+
+        }
+        Specification<Product> combinedSpec = Specification.where(null);
+        // bien target la bien optinal nen dung ispresent de kiem tra xem co gia tri hay
+        // khong
+        if (productCriteriaDTO.getTarget() != null && productCriteriaDTO.getTarget().isPresent()) {
+            Specification<Product> currentSpecs = ProductSpecs.matchListTarget(
+                    productCriteriaDTO.getTarget().get());
+
+            combinedSpec = combinedSpec.and(currentSpecs);
+        }
+        if (productCriteriaDTO.getFactory() != null && productCriteriaDTO.getFactory().isPresent()) {
+            Specification<Product> currentSpecs = ProductSpecs.matchListFactory(
+                    productCriteriaDTO.getFactory().get());
+
+            combinedSpec = combinedSpec.and(currentSpecs);
+
+        if (productCriteriaDTO.getPrice() != null && productCriteriaDTO.getPrice().isPresent()) {
+            Specification<Product> currentSpecs = this.buildPriceSpecification(productCriteriaDTO.getPrice().get());
+            combinedSpec = combinedSpec.and(currentSpecs);
+        }
+        // if (productCriteriaDTO.getPrice().isPresent()) {
+        // Specification<Product> currentSpecs =
+        // ProductSpecs.matchListFactory(productCriteriaDTO.getPrice().get());
+        // }
+        return this.productRepository.findAll(combinedSpec, page);
+    }
+ // case1
     // public Page<Product> fetchProductsWithSpec(Pageable page,
     // double min) {
     // return this.productRepository.findAll(ProductSpecs.minPrice(min), page);
     // }
 
-    // case 2 max-price
+// case 2 max-price
     // public Page<Product> fetchProductsWithSpec(Pageable page,
     // double max) {
     // return this.productRepository.findAll(ProductSpecs.minPrice(max), page);
@@ -85,7 +115,7 @@ public class ProductService {
     // page);
     // }
 
-    // case5 price range
+    // // case5 price range
     // public Page<Product> fetchProductsWithSpec(Pageable page, String price) {
     // // eg: price 10-toi-15-trieu
     // if (price.equals("10-toi-15-trieu")) {
@@ -104,29 +134,29 @@ public class ProductService {
     // }
 
     // case 6 price many range
-    public Page<Product> fetchProductsWithSpec(Pageable page, List<String> price) {
+    public Specification<Product> buildPriceSpecification(List<String> price) {
         Specification<Product> combinedSpec = (root, query, criteriaBuilder) -> criteriaBuilder.disjunction();
-        int count = 0;
         for (String p : price) {
             double min = 0;
             double max = 0;
 
             // Set the appropriate min and max based on the price range string
             switch (p) {
-                case "10-toi-15-trieu":
+                case "duoi-10-trieu":
+                    min = 0;
+                    max = 10000000;
+                    break;
+                case "10-15-trieu":
                     min = 10000000;
                     max = 15000000;
-                    count++;
                     break;
-                case "15-toi-20-trieu":
-                    min = 15000000;
-                    max = 20000000;
-                    count++;
-                    break;
-                case "20-toi-30-trieu":
+                case "15-20-trieu":
                     min = 20000000;
-                    max = 30000000;
-                    count++;
+                    max = 200000000;
+                    break;
+                case "tren-20-trieu":
+                    min = 20000000;
+                    max = 200000000;
                     break;
                 // Add more cases as needed
             }
@@ -137,13 +167,9 @@ public class ProductService {
             }
         }
 
-        // Check if any price ranges were added (combinedSpec is empty)
-        if (count == 0) {
-            return this.productRepository.findAll(page);
-        }
-
-        return this.productRepository.findAll(combinedSpec, page);
+        return combinedSpec;
     }
+}
 
     public Optional<Product> fetchProductById(long id) {
         return this.productRepository.findById(id);
