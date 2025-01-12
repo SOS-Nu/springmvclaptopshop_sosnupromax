@@ -37,12 +37,6 @@ public class ProductSpecs {
         return (root, query, criteriaBuilder) -> criteriaBuilder.in(root.get(Product_.TARGET)).value(target);
     }
 
-    // case 5 price range
-    // public static Specification<Product> matchPrice(double min, double max) {
-    // return (root, query, criteriaBuilder) ->
-    // criteriaBuilder.between(root.get(Product_.PRICE), min, max);
-    // }
-
     public static Specification<Product> matchPrice(double min, double max) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.and(
                 criteriaBuilder.gt(root.get(Product_.PRICE), min),

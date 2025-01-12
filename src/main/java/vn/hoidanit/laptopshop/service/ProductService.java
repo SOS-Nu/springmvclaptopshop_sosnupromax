@@ -79,63 +79,19 @@ public class ProductService {
 
             combinedSpec = combinedSpec.and(currentSpecs);
 
+        }
         if (productCriteriaDTO.getPrice() != null && productCriteriaDTO.getPrice().isPresent()) {
             Specification<Product> currentSpecs = this.buildPriceSpecification(productCriteriaDTO.getPrice().get());
             combinedSpec = combinedSpec.and(currentSpecs);
         }
-        // if (productCriteriaDTO.getPrice().isPresent()) {
-        // Specification<Product> currentSpecs =
-        // ProductSpecs.matchListFactory(productCriteriaDTO.getPrice().get());
-        // }
         return this.productRepository.findAll(combinedSpec, page);
     }
- // case1
-    // public Page<Product> fetchProductsWithSpec(Pageable page,
-    // double min) {
-    // return this.productRepository.findAll(ProductSpecs.minPrice(min), page);
-    // }
-
-// case 2 max-price
-    // public Page<Product> fetchProductsWithSpec(Pageable page,
-    // double max) {
-    // return this.productRepository.findAll(ProductSpecs.minPrice(max), page);
-    // }
-
-    // case 3 factory
-    // public Page<Product> fetchProductsWithSpec(Pageable page,
-    // String factory) {
-    // return this.productRepository.findAll(ProductSpecs.matchFactory(factory),
-    // page);
-    // }
-
-    // case 4 many factory
-    // public Page<Product> fetchProductsWithSpec(Pageable page,
-    // List<String> factory) {
-    // return this.productRepository.findAll(ProductSpecs.matchListFactory(factory),
-    // page);
-    // }
-
-    // // case5 price range
-    // public Page<Product> fetchProductsWithSpec(Pageable page, String price) {
-    // // eg: price 10-toi-15-trieu
-    // if (price.equals("10-toi-15-trieu")) {
-    // double min = 10000000;
-    // double max = 15000000;
-    // return this.productRepository.findAll(ProductSpecs.matchPrice(min, max),
-    // page);
-
-    // } else if (price.equals("15-toi-30-trieu")) {
-    // double min = 15000000;
-    // double max = 30000000;
-    // return this.productRepository.findAll(ProductSpecs.matchPrice(min, max),
-    // page);
-    // } else
-    // return this.productRepository.findAll(page);
-    // }
 
     // case 6 price many range
     public Specification<Product> buildPriceSpecification(List<String> price) {
-        Specification<Product> combinedSpec = (root, query, criteriaBuilder) -> criteriaBuilder.disjunction();
+
+        // where null de tao ra 1 specification rong doc trong specification
+        Specification<Product> combinedSpec = Specification.where(null);
         for (String p : price) {
             double min = 0;
             double max = 0;
@@ -169,7 +125,6 @@ public class ProductService {
 
         return combinedSpec;
     }
-}
 
     public Optional<Product> fetchProductById(long id) {
         return this.productRepository.findById(id);
