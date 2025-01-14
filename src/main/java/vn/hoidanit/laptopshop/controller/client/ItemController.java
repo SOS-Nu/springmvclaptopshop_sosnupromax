@@ -194,14 +194,14 @@ public class ItemController {
 
         String qs = request.getQueryString();
         if (qs != null && !qs.isBlank()) {
-            qs = qs.replace("page=" + "page=" + page, "");
+            qs = qs.replace("page=" + page, "");
 
         }
 
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", prs.getTotalPages());
-        model.addAttribute("querystring", qs);
+        model.addAttribute("queryString", qs);
 
         return "client/product/show";
     }
