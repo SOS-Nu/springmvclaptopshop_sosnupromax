@@ -140,8 +140,19 @@ public class ItemController {
     }
 
     @GetMapping("/thanks")
-    public String getThankYouPage(Model model) {
+    public String getThankYouPage(Model model,
+            @RequestParam("vnp_ResponseCode") Optional<String> vnpayResponseCode,
+            @RequestParam("vnp_TxnRef") Optional<String> paymentRef) {
+        if (vnpayResponseCode.isPresent() && paymentRef.isPresent()) {
+            // thanh toan qua vn pay, cap nhat order neu nhu co gia tri
+            String paymentStatus = vnpayResponseCode.get().equals("00")
+                    ? "PAYMENT_SUCCESS"
+                    : "PAYMENT_FAILED";
+            this.productService.updatePaymentStatus(paymentRef.get(), paymentStatus);
+
+        }
         return "client/cart/thanks";
+
     }
 
     @PostMapping("/add-product-from-view-detail")
