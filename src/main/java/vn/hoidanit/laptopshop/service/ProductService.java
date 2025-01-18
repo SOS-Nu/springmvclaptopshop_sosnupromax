@@ -2,6 +2,7 @@ package vn.hoidanit.laptopshop.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -224,7 +225,7 @@ public class ProductService {
 
     public void handlePlaceOrder(User user,
             HttpSession session, String receiverName,
-            String receiverAddress, String receiverPhone) {
+            String receiverAddress, String receiverPhone, String paymentMethod) {
 
         // create orderdetail
 
@@ -240,7 +241,10 @@ public class ProductService {
                 order.setReceiverAddress(receiverAddress);
                 order.setReceiverPhone(receiverPhone);
                 order.setStatus("PENDING");
-
+                order.setPaymentMethod(paymentMethod);
+                order.setPaymentStatus("PAYMENT_UNPAID");
+                final String uuid = UUID.randomUUID().toString().replace("-", "");
+                order.setPaymentRef(paymentMethod.equals("COD") ? "UNKNOWN" : uuid);
                 double sum = 0;
                 for (CartDetail cd : cartDetails) {
                     sum += cd.getPrice() * cd.getQuantity();
