@@ -1,9 +1,10 @@
 package vn.hoidanit.laptopshop.controller.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,14 +27,18 @@ import vn.hoidanit.laptopshop.domain.Product_;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.domain.dto.ProductCriteriaDTO;
 import vn.hoidanit.laptopshop.service.ProductService;
+import vn.hoidanit.laptopshop.service.VNPayService;
 
 @Controller
 public class ItemController {
 
     private final ProductService productService;
+    private final VNPayService vNPayService;
 
-    public ItemController(ProductService productService) {
+    public ItemController(ProductService productService,
+            VNPayService vNPayService) {
         this.productService = productService;
+        this.vNPayService = vNPayService;
     }
 
     @GetMapping("/product/{id}")
@@ -124,17 +129,23 @@ public class ItemController {
             @RequestParam("receiverName") String receiverName,
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone,
-            @RequestParam("paymentMethod") String paymentMethod) {
+            @RequestParam("paymentMethod") String paymentMethod,
+            @RequestParam("totalPrice") String totalPrice) throws UnsupportedEncodingException {
         User currentUser = new User();// null
         HttpSession session = request.getSession(false);
         long id = (long) session.getAttribute("id");
         currentUser.setId(id);
 
-        this.productService.handlePlaceOrder(currentUser, session,
-                receiverName, receiverAddress, receiverPhone, paymentMethod);
+        final String uuid = UUID.randomUUID().toString().replace("-", "");
 
-        if (paymentMethod.equals("COD")) {
+        this.productService.handlePlaceOrder(currentUser, session,
+                receiverName, receiverAddress, receiverPhone, paymentMethod, uuid);
+
+        if (!paymentMethod.equals("COD")) {
             // todo: redirect to vnpay
+            String ip = this.vNPayService.getIpAddress(request);
+            String vnpUrl = this.vNPayService.generateVNPayURL(Double.parseDouble(totalPrice), uuid, ip);
+            return "redirect:" + vnpUrl;
         }
         return "redirect:/thanks";
     }
@@ -146,7 +157,7 @@ public class ItemController {
         if (vnpayResponseCode.isPresent() && paymentRef.isPresent()) {
             // thanh toan qua vn pay, cap nhat order neu nhu co gia tri
             String paymentStatus = vnpayResponseCode.get().equals("00")
-                    ? "PAYMENT_SUCCESS"
+                    ? "PAYMENT_SUCCEED"
                     : "PAYMENT_FAILED";
             this.productService.updatePaymentStatus(paymentRef.get(), paymentStatus);
 
