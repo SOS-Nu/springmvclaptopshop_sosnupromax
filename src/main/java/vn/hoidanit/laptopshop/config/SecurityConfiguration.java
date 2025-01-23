@@ -16,6 +16,7 @@ import org.springframework.session.security.web.authentication.SpringSessionReme
 import jakarta.servlet.DispatcherType;
 import vn.hoidanit.laptopshop.service.CustomUserDetailsService;
 import vn.hoidanit.laptopshop.service.UserService;
+import vn.hoidanit.laptopshop.service.userinfo.CustomOAuth2UserService;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
@@ -46,7 +47,7 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationSuccessHandler customSuccessHandler() {
-        return new CustomSusccessHandler();
+        return new CustomSuccessHandler();
     }
 
     @Bean
@@ -58,7 +59,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, UserService userService) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD,
@@ -70,7 +71,16 @@ public class SecurityConfiguration {
                         .permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                        .anyRequest()
+                        .authenticated())
+
+                // .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(oauth2 -> oauth2.loginPage("/login")
+                        .successHandler(customSuccessHandler())
+                        .failureUrl("/login?error")
+                        .userInfoEndpoint(user -> user
+                                .userService(new CustomOAuth2UserService(userService))))
+
                 .sessionManagement((sessionManagement) -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .invalidSessionUrl("/logout?expired")

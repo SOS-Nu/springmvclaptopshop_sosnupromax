@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.service.UserService;
 
-public class CustomSusccessHandler implements AuthenticationSuccessHandler {
+public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
     private UserService userService;
