@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String fullName = (String) attributes.get("name");
 
         Role userRole = this.userService.getRoleByName("USER");
+
+        if (email == null) {
+            // handle exception
+            OAuth2Error error = new OAuth2Error("invalid_request",
+                    "Can't get email address. Maybe login with private email (Github)", null);
+            throw new OAuth2AuthenticationException(error);
+        }
+
         if (email != null) {
             User user = this.userService.getUserByEmail(email);
             if (user == null) {
@@ -47,9 +56,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 User oUser = new User();
 
                 oUser.setEmail(email);
-                oUser.setAvatar("default-google.png");
+                oUser.setAvatar(registrationId.equalsIgnoreCase("github")
+                        ? "default-github.png"
+                        : "default-google.png");
                 oUser.setFullName(fullName);
-                oUser.setProvider("GOOGLE");
+                oUser.setProvider(registrationId.equalsIgnoreCase("github")
+                        ? "GITHUB"
+                        : "GOOGLE");
                 oUser.setPassword("hoidanit");
                 oUser.setRole(userRole);
                 this.userService.saveUser(oUser);
